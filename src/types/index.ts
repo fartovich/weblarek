@@ -51,3 +51,66 @@ export interface IOrderResponse {
   id: string;
   total: number;
 }
+
+/* ---------- Типы слоя представления ---------- */
+/* Новые типы построены на основе уже объявленных и не изменяют их */
+
+// Обработчик действия пользователя, который компонент получает в конструкторе
+export interface ICardActions {
+  onClick: () => void;
+}
+
+// Данные шапки страницы
+export interface IHeader {
+  counter: number;
+}
+
+// Данные каталога на главной странице
+export interface IGallery {
+  catalog: HTMLElement[];
+}
+
+// Данные модального окна
+export interface IModal {
+  content: HTMLElement;
+}
+
+// Общие данные всех карточек товара
+export type TCard = Pick<IProduct, "title" | "price">;
+
+// Данные карточки в каталоге
+export type TCardCatalog = TCard & Pick<IProduct, "image" | "category">;
+
+// Данные карточки для подробного просмотра
+export type TCardPreview = TCardCatalog &
+  Pick<IProduct, "description"> & {
+    buttonText: string;
+    buttonDisabled: boolean;
+  };
+
+// Данные карточки в корзине
+export type TCardBasket = TCard & {
+  index: number;
+};
+
+// Данные корзины
+export interface IBasket {
+  items: HTMLElement[];
+  total: number;
+  buttonDisabled: boolean;
+}
+
+// Общие данные всех форм
+export interface IForm {
+  valid: boolean;
+  errors: string;
+}
+
+// Данные формы первого шага. Способ оплаты и адрес
+export type TOrderForm = IForm & Pick<IBuyer, "payment" | "address">;
+
+// Данные формы второго шага. Почта и телефон
+export type TContactsForm = IForm & Pick<IBuyer, "email" | "phone">;
+
+// Данные сообщения об успешном заказе
+export type TSuccess = Pick<IOrderResponse, "total">;

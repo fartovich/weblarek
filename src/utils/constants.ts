@@ -1,6 +1,6 @@
 /* Константа для получения полного пути для сервера. Для выполнения запроса 
 необходимо к API_URL добавить только ендпоинт. */
-export const API_URL = `${import.meta.env.VITE_API_ORIGIN}/api/weblarek`; 
+export const API_URL = `${import.meta.env.VITE_API_ORIGIN}/api/weblarek`;
 
 /* Константа для формирования полного пути к изображениям карточек. 
 Для получения полной ссылки на картинку необходимо к CDN_URL добавить только название файла изображения,
@@ -9,14 +9,41 @@ export const CDN_URL = `${import.meta.env.VITE_API_ORIGIN}/content/weblarek`;
 
 /* Константа соответствий категорий товара модификаторам, используемым для отображения фона категории. */
 export const categoryMap = {
-  'софт-скил': 'card__category_soft',
-  'хард-скил': 'card__category_hard',
-  'кнопка': 'card__category_button',
-  'дополнительное': 'card__category_additional',
-  'другое': 'card__category_other',
+  "софт-скил": "card__category_soft",
+  "хард-скил": "card__category_hard",
+  кнопка: "card__category_button",
+  дополнительное: "card__category_additional",
+  другое: "card__category_other",
 };
 
-export const settings = {
+export const settings = {};
 
+/* Названия событий, которые генерируются в приложении. */
+export const eventNames = {
+  // События моделей данных
+  catalogChanged: "catalog:changed",
+  previewChanged: "preview:changed",
+  basketChanged: "basket:changed",
+  buyerChanged: "buyer:changed",
+  // События представлений
+  cardSelect: "card:select",
+  cardToggle: "card:toggle",
+  basketOpen: "basket:open",
+  basketRemove: "basket:remove",
+  orderOpen: "order:open",
+  orderSubmit: "order:submit",
+  contactsSubmit: "contacts:submit",
+  formChange: "form:change",
+  modalClose: "modal:close",
+  successClose: "success:close",
+} as const;
+
+/* Текстовые значения, которые отображаются в интерфейсе. */
+export const currency = "синапсов";
+export const priceless = "Бесценно";
+export const buttonLabels = {
+  buy: "Купить",
+  remove: "Удалить из корзины",
+  unavailable: "Недоступно",
 };
-
+export const emptyBasketText = "Корзина пуста";
