@@ -16,7 +16,7 @@ import { Header } from "./components/view/Header";
 import { Modal } from "./components/view/Modal";
 import { OrderForm } from "./components/view/OrderForm";
 import { Success } from "./components/view/Success";
-import { IBuyer, IOrderRequest, IProduct } from "./types";
+import { IBuyer, IOrderRequest, IProduct, TPayment } from "./types";
 import { API_URL, buttonLabels, CDN_URL, eventNames } from "./utils/constants";
 import { cloneTemplate, ensureElement } from "./utils/utils";
 
@@ -31,7 +31,8 @@ const successTemplate = ensureElement<HTMLTemplateElement>("#success");
 
 /* Брокер событий, API и модели данных */
 const events = new EventEmitter();
-const larekApi = new LarekApi(new Api(API_URL));
+const api = new Api(API_URL);
+const larekApi = new LarekApi(api);
 const productsModel = new Products(events);
 const cartModel = new Cart(events);
 const buyerModel = new Buyer(events);
@@ -40,9 +41,7 @@ const buyerModel = new Buyer(events);
 const header = new Header(events, ensureElement<HTMLElement>(".header"));
 const gallery = new Gallery(ensureElement<HTMLElement>(".gallery"));
 const modal = new Modal(events, ensureElement<HTMLElement>("#modal-container"));
-const cardPreview = new CardPreview(cloneTemplate(cardPreviewTemplate), {
-  onClick: () => events.emit(eventNames.cardToggle),
-});
+const cardPreview = new CardPreview(events, cloneTemplate(cardPreviewTemplate));
 const basket = new Basket(events, cloneTemplate(basketTemplate));
 const orderForm = new OrderForm(events, cloneTemplate(orderTemplate));
 const contactsForm = new ContactsForm(events, cloneTemplate(contactsTemplate));
@@ -176,7 +175,7 @@ events.on<IProduct>(eventNames.cardSelect, (product) => {
 });
 
 // Нажата кнопка «Купить» или «Удалить из корзины» в карточке просмотра
-events.on(eventNames.cardToggle, () => {
+events.on(eventNames.cardAction, () => {
   const product = productsModel.getSelectedItem();
   if (!product) return;
   if (cartModel.hasItem(product.id)) {
@@ -194,7 +193,7 @@ events.on<IProduct>(eventNames.basketRemove, (product) => {
 
 // Нажата иконка корзины в шапке
 events.on(eventNames.basketOpen, () => {
-  openModal(renderBasket());
+  openModal(basket.render());
 });
 
 // Нажата кнопка «Оформить» в корзине
@@ -215,11 +214,10 @@ events.on(eventNames.orderSubmit, () => {
 // Нажата кнопка «Оплатить» в форме второго шага
 events.on(eventNames.contactsSubmit, () => {
   const buyer = buyerModel.getData();
-  if (!buyer.payment) return;
 
   const order: IOrderRequest = {
     ...buyer,
-    payment: buyer.payment,
+    payment: buyer.payment as TPayment,
     total: cartModel.getTotal(),
     items: cartModel.getItems().map((product) => product.id),
   };

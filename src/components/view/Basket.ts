@@ -1,8 +1,8 @@
 import { IBasket } from "../../types";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
-import { createElement, ensureElement } from "../../utils/utils";
-import { currency, emptyBasketText, eventNames } from "../../utils/constants";
+import { ensureElement } from "../../utils/utils";
+import { currency, eventNames } from "../../utils/constants";
 
 // Корзина. Список выбранных товаров, общая стоимость и кнопка оформления.
 export class Basket extends Component<IBasket> {
@@ -34,15 +34,7 @@ export class Basket extends Component<IBasket> {
   }
 
   set items(items: HTMLElement[]) {
-    if (items.length) {
-      this.listElement.replaceChildren(...items);
-    } else {
-      this.listElement.replaceChildren(
-        createElement<HTMLParagraphElement>("p", {
-          textContent: emptyBasketText,
-        }),
-      );
-    }
+    this.listElement.replaceChildren(...items);
   }
 
   set total(value: number) {

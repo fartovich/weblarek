@@ -426,8 +426,7 @@ type TSuccess = Pick<IOrderResponse, 'total'>;
 
 Методы класса:  
 `set title(value: string)` — выводит название товара.  
-`set price(value: number | null)` — выводит цену в формате «750 синапсов» или «Бесценно», если цены нет.  
-`setCategory(element: HTMLElement, value: string): void` — защищённый метод для наследников с категорией. Выводит текст категории и устанавливает модификатор фона по объекту `categoryMap` из `src/utils/constants.ts`.
+`set price(value: number | null)` — выводит цену в формате «750 синапсов» или «Бесценно», если цены нет. 
 
 #### Класс CardCatalog
 Карточка товара в каталоге (шаблон `#card-catalog`).
@@ -441,7 +440,7 @@ type TSuccess = Pick<IOrderResponse, 'total'>;
 
 Методы класса:  
 `set image(value: string)` — устанавливает изображение. Полный URL.  
-`set category(value: string)` — выводит категорию с нужным цветом фона.
+`set category(value: string)` — выводит текст категории и устанавливает модификатор фона по объекту `categoryMap` из `src/utils/constants.ts`.
 
 События:  
 Клик по карточке вызывает `actions.onClick`, который в презентере генерирует `card:select`.
@@ -450,9 +449,10 @@ type TSuccess = Pick<IOrderResponse, 'total'>;
 Карточка для подробного просмотра товара (шаблон `#card-preview`).
 
 Конструктор:  
-`constructor(container: HTMLElement, actions?: ICardActions)` — принимает разметку карточки и обработчик клика по кнопке.
+`constructor(events: IEvents, container: HTMLElement)` — принимает брокер событий и разметку карточки.
 
 Поля класса:  
+`events: IEvents` — брокер событий.
 `imageElement: HTMLImageElement` — изображение. Элемент `.card__image`.  
 `categoryElement: HTMLElement` — категория. Элемент `.card__category`.  
 `descriptionElement: HTMLElement` — описание. Элемент `.card__text`.  
@@ -460,13 +460,13 @@ type TSuccess = Pick<IOrderResponse, 'total'>;
 
 Методы класса:  
 `set image(value: string)` — устанавливает изображение.  
-`set category(value: string)` — выводит категорию с нужным цветом фона.  
+`set category(value: string)` — выводит текст категории и устанавливает модификатор фона по объекту `categoryMap` из `src/utils/constants.ts`.  
 `set description(value: string)` — выводит описание.  
 `set buttonText(value: string)` — устанавливает текст кнопки.  
 `set buttonDisabled(value: boolean)` — блокирует или разблокирует кнопку.
 
 События:  
-Клик по кнопке вызывает `actions.onClick`, который в презентере генерирует `card:toggle`.
+Клик по кнопке генерирует `card:action` без данных. Решение, что делать с товаром (добавить в корзину или удалить), принимает презентер, получая текущий товар из `Products.getSelectedItem()`.
 
 #### Класс CardBasket
 Карточка товара в списке корзины (шаблон `#card-basket`).
@@ -497,7 +497,7 @@ type TSuccess = Pick<IOrderResponse, 'total'>;
 `orderButton: HTMLButtonElement` — кнопка «Оформить». Элемент `.basket__button`.
 
 Методы класса:  
-`set items(items: HTMLElement[])` — выводит карточки товаров. Если массив пуст, выводит надпись «Корзина пуста».  
+`set items(items: HTMLElement[])` — выводит карточки товаров. Если массив пуст, список остаётся без дочерних элементов, а надпись «Корзина пуста» выводится стилями `basket.scss` для пустого списка.  
 `set total(value: number)` — выводит общую стоимость.  
 `set buttonDisabled(value: boolean)` — блокирует или разблокирует кнопку «Оформить».
 
@@ -590,7 +590,7 @@ type TSuccess = Pick<IOrderResponse, 'total'>;
 | Событие | Кто генерирует | Когда | Данные |
 |---|---|---|---|
 | `card:select` | обработчик `CardCatalog` | выбрана карточка в каталоге | `IProduct` |
-| `card:toggle` | обработчик `CardPreview` | нажата кнопка «Купить» или «Удалить из корзины» | — |
+| `card:action` | `CardPreview` | нажата кнопка «Купить» или «Удалить из корзины» | — |
 | `basket:remove` | обработчик `CardBasket` | нажата кнопка удаления товара в корзине | `IProduct` |
 | `basket:open` | `Header` | нажата иконка корзины | — |
 | `order:open` | `Basket` | нажата кнопка «Оформить» | — |
@@ -608,10 +608,10 @@ type TSuccess = Pick<IOrderResponse, 'total'>;
 - `catalog:changed` — для каждого товара создаётся `CardCatalog`, массив карточек выводится в `Gallery`.
 - `card:select` — выбранный товар сохраняется в `Products.setSelectedItem`.
 - `preview:changed` — `CardPreview` заполняется данными выбранного товара и открывается в модальном окне. Текст кнопки «Недоступно» и кнопка заблокирована, если у товара нет цены. «Удалить из корзины», если товар в корзине. Иначе «Купить».
-- `card:toggle` — выбранный товар добавляется в корзину или удаляется из неё, модальное окно закрывается.
+- `card:action` — выбранный товар добавляется в корзину или удаляется из неё, модальное окно закрывается.
 - `basket:changed` — обновляется счётчик в `Header` и перерисовывается `Basket`: карточки `CardBasket`, сумма, блокировка кнопки «Оформить» при пустой корзине.
 - `basket:remove` — товар удаляется из корзины.
-- `basket:open` — `Basket` перерисовывается и открывается в модальном окне.
+- `basket:open` — заполненное представление `Basket` открывается в модальном окне. Список товаров перерисовывается только по `basket:changed`.
 - `order:open` — в модальном окне открывается `OrderForm` с текущими данными покупателя.
 - `form:change` — данные сохраняются в `Buyer.setData`.
 - `buyer:changed` — перерисовываются обе формы: значения полей, ошибки валидации из `Buyer.validate` (для каждой формы — только её поля) и активность кнопки отправки.

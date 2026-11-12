@@ -27,7 +27,7 @@ export const eventNames = {
   buyerChanged: "buyer:changed",
   // События представлений
   cardSelect: "card:select",
-  cardToggle: "card:toggle",
+  cardAction: "card:action",
   basketOpen: "basket:open",
   basketRemove: "basket:remove",
   orderOpen: "order:open",
@@ -46,4 +46,3 @@ export const buttonLabels = {
   remove: "Удалить из корзины",
   unavailable: "Недоступно",
 };
-export const emptyBasketText = "Корзина пуста";

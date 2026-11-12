@@ -1,6 +1,9 @@
 import { ICardActions, TCardCatalog } from "../../types";
 import { Card } from "./Card";
 import { ensureElement } from "../../utils/utils";
+import { categoryMap } from "../../utils/constants";
+
+type TCategory = keyof typeof categoryMap;
 
 // Карточка товара в каталоге на главной странице. Вся карточка это кнопка выбора товара для просмотра.
 export class CardCatalog extends Card<TCardCatalog> {
@@ -32,6 +35,13 @@ export class CardCatalog extends Card<TCardCatalog> {
   }
 
   set category(value: string) {
-    this.setCategory(this.categoryElement, value);
+    this.categoryElement.textContent = value;
+    Object.values(categoryMap).forEach((modifier) =>
+      this.categoryElement.classList.remove(modifier),
+    );
+    const modifier = categoryMap[value as TCategory];
+    if (modifier) {
+      this.categoryElement.classList.add(modifier);
+    }
   }
 }
